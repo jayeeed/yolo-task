@@ -1,0 +1,92 @@
+{
+  "metadata": {
+    "video_path": "videos\\test_video.mp4",
+    "fps": 30.0,
+    "total_frames": 906,
+    "duration_seconds": 30.2,
+    "sample_rate": 5
+  },
+  "shot_cuts": {
+    "total_cuts": 9,
+    "cuts": [
+      {
+        "frame": 250,
+        "timestamp": 8.33,
+        "difference": 0.54
+      },
+      {
+        "frame": 380,
+        "timestamp": 12.67,
+        "difference": 0.65
+      },
+      {
+        "frame": 415,
+        "timestamp": 13.83,
+        "difference": 0.58
+      },
+      {
+        "frame": 465,
+        "timestamp": 15.5,
+        "difference": 0.58
+      },
+      {
+        "frame": 545,
+        "timestamp": 18.17,
+        "difference": 0.68
+      },
+      {
+        "frame": 765,
+        "timestamp": 25.5,
+        "difference": 0.6
+      },
+      {
+        "frame": 805,
+        "timestamp": 26.83,
+        "difference": 0.89
+      },
+      {
+        "frame": 850,
+        "timestamp": 28.33,
+        "difference": 0.93
+      },
+      {
+        "frame": 890,
+        "timestamp": 29.67,
+        "difference": 0.5
+      }
+    ],
+    "average_shot_length": 3.02
+  },
+  "motion_analysis": {
+    "average_motion": 3.02,
+    "max_motion": 7.32,
+    "min_motion": 0.0,
+    "motion_std": 1.48
+  },
+  "text_detection": {
+    "text_present_ratio": 0.6,
+    "frames_with_text": 54,
+    "total_sampled_frames": 90,
+    "top_keywords": [
+      "and",
+      "(official",
+      "that",
+      "takes",
+      "away",
+      "special",
+      "she",
+      "place",
+      "downfall",
+      "when"
+    ],
+    "unique_words": 50
+  },
+  "object_detection": {
+    "total_persons_detected": 55,
+    "total_objects_detected": 2,
+    "person_ratio": 0.965,
+    "object_ratio": 0.035,
+    "avg_persons_per_frame": 0.92,
+    "avg_objects_per_frame": 0.03
+  }
+}
