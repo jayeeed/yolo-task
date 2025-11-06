@@ -57,11 +57,11 @@
     "unique_words": 50
   },
   "object_detection": {
-    "total_persons_detected": 68,
-    "total_objects_detected": 10,
-    "person_ratio": 0.872,
-    "object_ratio": 0.128,
-    "avg_persons_per_frame": 1.13,
-    "avg_objects_per_frame": 0.17
+    "total_persons_detected": 67,
+    "total_objects_detected": 12,
+    "person_ratio": 0.848,
+    "object_ratio": 0.152,
+    "avg_persons_per_frame": 1.12,
+    "avg_objects_per_frame": 0.2
   }
 }

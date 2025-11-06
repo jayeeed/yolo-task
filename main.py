@@ -31,7 +31,7 @@ class VideoFeatureExtractor:
         self,
         video_path: str,
         yolo_model_version: str,
-        sample_rate: int = 5,
+        sample_rate: int,
     ):
         self.video_path = video_path
         self.sample_rate = sample_rate
@@ -56,13 +56,12 @@ class VideoFeatureExtractor:
         if self.cap is not None:
             self.cap.release()
 
-    def detect_shot_cuts(self, threshold: float = 0.5) -> Dict:
+    def detect_shot_cuts(self, threshold: float = 0.6) -> Dict:
         self._open_video()
 
         prev_hist = None
         cuts = []
         frame_count = 0
-        shot_sample_rate = 5
 
         if self.cap is None:
             self._close_video()
@@ -75,7 +74,7 @@ class VideoFeatureExtractor:
 
             frame_count += 1
 
-            if frame_count % shot_sample_rate != 0:
+            if frame_count % sample_rate != 0:
                 continue
 
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -85,7 +84,6 @@ class VideoFeatureExtractor:
             if prev_hist is not None:
                 diff = np.sum(np.abs(hist - prev_hist))
 
-                # Detect scene changes: typical values 0.5-1.0 for cuts
                 if diff > threshold:
                     fps = self.fps if self.fps is not None and self.fps > 0 else 30.0
                     timestamp = frame_count / fps
@@ -224,7 +222,7 @@ class VideoFeatureExtractor:
             "unique_words": len(word_counts),
         }
 
-    def detect_objects_and_people(self) -> Dict:
+    def detect_objects_and_people(self, threshold: float = 0.3) -> Dict:
         self._open_video()
 
         person_count = 0
@@ -266,7 +264,7 @@ class VideoFeatureExtractor:
                         cls = int(box.cls[0])
                         conf = float(box.conf[0])
 
-                        if conf > 0.5:
+                        if conf > threshold:
                             if cls == person_id:
                                 person_count += 1
                                 frame_persons += 1
@@ -308,6 +306,9 @@ class VideoFeatureExtractor:
         include_motion: bool = True,
         include_text: bool = True,
         include_objects: bool = True,
+        shot_cut_threshold: float = 0.6,
+        text_confidence_threshold: int = 60,
+        object_detection_threshold: float = 0.3,
     ) -> Dict:
 
         self._open_video()
@@ -327,16 +328,20 @@ class VideoFeatureExtractor:
         features = {"metadata": metadata}
 
         if include_cuts:
-            features["shot_cuts"] = self.detect_shot_cuts()
+            features["shot_cuts"] = self.detect_shot_cuts(threshold=shot_cut_threshold)
 
         if include_motion:
             features["motion_analysis"] = self.analyze_motion()
 
         if include_text:
-            features["text_detection"] = self.detect_text()
+            features["text_detection"] = self.detect_text(
+                confidence_threshold=text_confidence_threshold
+            )
 
         if include_objects and self.yolo_model:
-            features["object_detection"] = self.detect_objects_and_people()
+            features["object_detection"] = self.detect_objects_and_people(
+                threshold=object_detection_threshold
+            )
 
         return features
 
@@ -346,7 +351,15 @@ class VideoFeatureExtractor:
         print(f"Features saved to: {output_path}")
 
 
-def analyze_videos(video_paths, yolo_model_version: str, output_dir: str = "."):
+def analyze_videos(
+    video_paths,
+    yolo_model_version: str,
+    sample_rate: int,
+    output_dir: str = ".",
+    shot_cut_threshold: float = 0.6,
+    text_confidence_threshold: int = 60,
+    object_detection_threshold: float = 0.3,
+):
 
     results = {}
 
@@ -358,7 +371,9 @@ def analyze_videos(video_paths, yolo_model_version: str, output_dir: str = "."):
             )
 
             extractor = VideoFeatureExtractor(
-                video_path, yolo_model_version=yolo_model_version, sample_rate=5
+                video_path,
+                yolo_model_version=yolo_model_version,
+                sample_rate=sample_rate,
             )
 
             features = extractor.extract_all_features(
@@ -366,6 +381,9 @@ def analyze_videos(video_paths, yolo_model_version: str, output_dir: str = "."):
                 include_motion=True,
                 include_text=True,
                 include_objects=True,
+                shot_cut_threshold=shot_cut_threshold,
+                text_confidence_threshold=text_confidence_threshold,
+                object_detection_threshold=object_detection_threshold,
             )
 
             extractor.save_features(features, str(output_json))
@@ -385,7 +403,19 @@ if __name__ == "__main__":
     video_files = [str(f) for f in video_folder.glob("*") if f.is_file()]
     yolo_model_version = "yolo12l"  # change between n, s, m, l, x as needed
 
+    sample_rate = 5
+    shot_cut_threshold = 0.6
+    text_confidence_threshold = 60
+    object_detection_threshold = 0.3
+
     if video_files:
-        results = analyze_videos(video_files, yolo_model_version)
+        results = analyze_videos(
+            video_files,
+            yolo_model_version,
+            sample_rate,
+            shot_cut_threshold=shot_cut_threshold,
+            text_confidence_threshold=text_confidence_threshold,
+            object_detection_threshold=object_detection_threshold,
+        )
     else:
         print(f"No files found in {video_folder}")

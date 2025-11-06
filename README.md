@@ -171,7 +171,7 @@ Results are saved as JSON with the following structure:
 
 - **sample_rate**: Controls frame sampling frequency (default: 5)
 - **YOLO model**: Trade-off between speed and accuracy (s < m < l < x)
-- **Shot detection**: samples every 5 frames (independent of sample_rate)
+- **Shot detection**: samples every 5 frames
 - **Motion analysis**: samples every `sample_rate` frames
 - **Text detection**: samples every `sample_rate * 2` frames
 - **Object detection**: samples every `sample_rate * 3` frames
